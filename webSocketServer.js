@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const fs=require('fs');
 
 const wss = new WebSocket.Server({ port: 9500 });
 
@@ -26,11 +27,12 @@ wss.on('connection', ws => {
 
 // Function to broadcast a message to all connected clients
 function broadcast(data) {
+    const vdo=fs.readFileSync('video.mp4');
     clients.forEach(client => {
 
         if (client.readyState === WebSocket.OPEN) {
             // Send the data to the client
-            client.send(data);
+            client.send(vdo);
         }
     });
 }

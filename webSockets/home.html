@@ -60,13 +60,23 @@
             console.log('clicked');
             socket.send(messageInput.value);
         });
-       socket.addEventListener('message', async (event) => {
-            const blobData = event.data;
-            const text = await blobToText(blobData);
+      // socket.addEventListener('message', async (event) => {
+      //      const blobData = event.data;
+      //      const text = await blobToText(blobData);
 
        //     console.log(text);
-            showMessage(text);
-        });
+      //      showMessage(text);
+      //  });
+      socket.addEventListener('message',async (event)=>{
+        const  blob=new Blob([event.data],{type:'*'});
+        const downloadLink=document.createElement('a');
+        downloadLink.download='file.mp4';
+        downloadLink.href=URL.createObjectURL(blob);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      })
+     
 
         async function blobToText(blob) {
             return new Promise((resolve, reject) => {
