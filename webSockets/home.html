@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web socket Server</title>
+    <style>
+        body {
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            justify-content: space-around;
+        }
+        button{
+            width: 120px;
+            height: 40px;
+            font-size: 17px;
+            align-content: center;
+            color: green;
+            align-self: center;
+            box-shadow: 0px 10px 10px 0px rgba(114, 111, 111, 0.75);
+            background-color: orange;
+            border-radius: 10px;
+            border: none;
+        }
+        button:hover{
+            scale: 1.05;
+            cursor: pointer;
+            background-color: red;
+        }
+        input{
+            width: 500px;
+            height: 40px;
+            border-radius: 30px;
+        }
+    </style>
+</head>
+<body>
+    <pre id="box" style="height: 400px; overflow: scroll"></pre>
+    <input type="text" id="message">
+    <button id="btn1">Send</button>
+</body>
+<script>
+    var btn1 = document.getElementById("btn1");
+    const messageBox = document.getElementById('box');
+    const messageInput = document.getElementById('message');
+    var socket = new WebSocket("ws://localhost:9500");
+
+    function showMessage(messageBuffer) {
+           const message = messageBuffer.toString('utf-8'); // Assuming utf-8 encoding
+           console.log('Received message:', message);
+            messageBox.textContent += `\n\n${message}`;
+            messageBox.scrollTop = messageBox.scrollHeight;
+            messageInput.value = '';
+    }
+
+    socket.onopen = () => {
+        btn1.addEventListener('click', () => {
+            console.log('clicked');
+            socket.send(messageInput.value);
+        });
+       socket.addEventListener('message', async (event) => {
+            const blobData = event.data;
+            const text = await blobToText(blobData);
+
+       //     console.log(text);
+            showMessage(text);
+        });
+
+        async function blobToText(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onload = () => {
+                    resolve(reader.result);
+                };
+
+                reader.onerror = reject;
+
+                reader.readAsText(blob);
+            });
+        }
+
+    }
+</script>
+</html>
